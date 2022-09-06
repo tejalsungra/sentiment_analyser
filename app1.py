@@ -98,6 +98,7 @@ def for_plot(df_name):
 
 scores = compound_score(only_tweet)
 
+
 plot = for_plot(scores)
 
 
