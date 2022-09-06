@@ -2,27 +2,18 @@ streamlit
 
 pandas  
 
-snscrape.modules.twitter
+snscrape
 numpy 
 
-matplotlib.pyplot 
+matplotlib
 seaborn 
 nltk
-nltk
-nltk.corpus 
-stopwords
-nltk
-nltk.sentiment
-vader 
 SentimentIntensityAnalyzer
 
 datetime
  
 WordCloud
 
-PIL 
 Image
 
 warnings
-warnings
-filterwarnings
