@@ -1,19 +1,31 @@
-import streamlit as st
-import pandas as pd
-import pickle as pkl
-import itertools
-import snscrape.modules.twitter as sntwitter
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import nltk
+streamlit 
+
+pandas 
+pickle 
+
+itertools
+
+snscrape.modules.twitter
+numpy 
+
+matplotlib.pyplot 
+seaborn 
+nltk
 nltk.download('vader_lexicon')
-from nltk.corpus import stopwords
+nltk.corpus 
+stopwords
 nltk.download('stopwords')
 stop = (stopwords.words('english'))
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-import datetime
-from wordcloud import WordCloud
-from PIL import Image
-import warnings
+
+nltk.sentiment.vader 
+SentimentIntensityAnalyzer
+
+datetime
+ 
+WordCloud
+
+PIL 
+Image
+
+warnings
 warnings.filterwarnings('ignore')
