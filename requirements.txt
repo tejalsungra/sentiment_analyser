@@ -28,4 +28,4 @@ Image
 
 warnings
 warnings
-filterwarnings('ignore')
+filterwarnings
