@@ -8,8 +8,6 @@ numpy
 matplotlib
 seaborn 
 nltk
-SentimentIntensityAnalyzer
-
 datetime
  
 WordCloud
