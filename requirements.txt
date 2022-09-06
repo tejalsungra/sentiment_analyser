@@ -2,8 +2,6 @@ streamlit
 
 pandas  
 
-itertools
-
 snscrape.modules.twitter
 numpy 
 
