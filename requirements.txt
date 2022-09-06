@@ -11,13 +11,12 @@ numpy
 matplotlib.pyplot 
 seaborn 
 nltk
-nltk.download('vader_lexicon')
+nltk
 nltk.corpus 
 stopwords
-nltk.download('stopwords')
-stop = (stopwords.words('english'))
-
-nltk.sentiment.vader 
+nltk
+nltk.sentiment
+vader 
 SentimentIntensityAnalyzer
 
 datetime
@@ -28,4 +27,5 @@ PIL
 Image
 
 warnings
-warnings.filterwarnings('ignore')
+warnings
+filterwarnings('ignore')
