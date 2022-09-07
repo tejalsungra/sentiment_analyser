@@ -12,57 +12,68 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 stop = (stopwords.words('english'))
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-import datetime
+from datetime import datetime, timedelta, date
 from wordcloud import WordCloud
 from PIL import Image
+from zoneinfo import ZoneInfo
+import pytz
 import warnings
 warnings.filterwarnings('ignore')
 
 
-# function for fetching the tweets                                                                      
-def fetch_tweets(keyword,city,radius,number,start_date, end_date):
-    tweets = pd.DataFrame(itertools.islice(sntwitter.TwitterSearchScraper(f'{keyword} since:{start_date} until:{end_date} near:{city} within:{radius}km').get_items(),number))
-    tweets['date'] = pd.to_datetime(tweets['date'],format='%Y-%m-%d').dt.date
-    tweets['years'] = pd.DatetimeIndex(tweets['date']).year
-    tweets['month'] = pd.DatetimeIndex(tweets['date']).month_name()
-    return(tweets)
+
 
 
 
 #st.set_page_config(page_title="Sentiment Analyzer", layout="wide")
 st.title("🐦 Sentiments Analyzer  😄😑😢")
 
-keyword = st.sidebar.text_input('Enter your keyword 🔎 ', 'keyword')
+
+
+keyword = st.sidebar.text_input('Enter your keyword 🔎 ', '')
 st.write('Search term 🔎  :    ', keyword)
 
-city = st.sidebar.text_input('City name 📍', 'city')
-st.write('The current selected city is  📍  :   ', city)
+cities = st.sidebar.text_input('City name 📍', '')
+st.write('The current selected city is  📍  :   ', cities)
 
 
-radius = st.sidebar.number_input('Radius (in Km) 🌍')
-st.write('The selected radius is  🌍  :   ', radius)
+radii = st.sidebar.slider('Radius (in Km) 🌍',0)
+st.write('The selected radius is  🌍  :   ', radii)
 
 
-number = st.sidebar.slider('No. of tweets', 1, 1000)
-st.write('Number of tweets shown :   ', number )
+
+nt = st.sidebar.slider('No. of tweets', 1, 1000, 0)
+st.write('Number of tweets shown :   ', nt )
+
 
 col1, col2 = st.columns(2)
 with col1:
-    start_date = st.date_input(" Enter start Date  📅", key='#start_date_range', value=pd.to_datetime("today", format="%Y-%m-%d"), min_value=pd.to_datetime("2006-03-21", format="%Y-%m-%d"), max_value=pd.to_datetime("today", format="%Y-%m-%d"))
+    start_date = st.date_input(" Enter start Date  📅", key='#start_date_range', value=pd.to_datetime((date.today() - timedelta(days=1)), format="%Y-%m-%d"), min_value=pd.to_datetime("2006-03-21", format="%Y-%m-%d"), max_value=pd.to_datetime("today", format="%Y-%m-%d"))
     #st.write(start_date)
 
 with col2:
     end_date = st.date_input("Enter end Date  📅", key='#end_date_range', value=pd.to_datetime("today", format="%Y-%m-%d"), min_value=pd.to_datetime("2006-03-21", format="%Y-%m-%d"), max_value=pd.to_datetime("today", format="%Y-%m-%d"))
+    
 
+
+
+# function for fetching the tweets                                                                      
+def fetch_tweets(keyword,city,radius,number,start_date, end_date):
+  
+    tweets = pd.DataFrame(itertools.islice(sntwitter.TwitterSearchScraper( f'{keyword} since:{start_date} until:{end_date} near:{city} within:{radius}km').get_items(),number))
+    #st.write(tweets)
+    tweets['date'] = pd.to_datetime(tweets['date'], format = "%Y-%m-%d").dt.date
+    
 
     
-only_tweet = fetch_tweets(keyword, city, radius, number,start_date,end_date )[['date', 'content']]
-
-
-st.write('Tweets  💬', only_tweet)
-
+    #tweets['years'] = pd.DatetimeIndex(tweets['date']).year
+    #tweets['month'] = pd.DatetimeIndex(tweets['date']).month_name()
+    #tweet_year = tweets.query(f'years=={yearss}')
+    
+    return(tweets)
 
 # function for generating compound score
+
 def compound_score(df_name):
 
     sid = SentimentIntensityAnalyzer()
@@ -81,7 +92,6 @@ def compound_score(df_name):
     df_name['comp_score'] = df_name['compound'].apply(lambda c: 'positive' if c > 0.3 else ('negative' if c< -0.3 else 'neutral'))
     return(df_name)
 
-
 def for_plot(df_name):
     df_name['date'] = pd.to_datetime(df_name['date']).dt.date
     df_name['date'] = pd.to_datetime(df_name['date'])
@@ -96,15 +106,7 @@ def for_plot(df_name):
     df_name = df_name.groupby("year").agg({'compound':'mean'}).sort_values('year', ascending = True)
     return(df_name)
 
-scores = compound_score(only_tweet)
-
-
-plot = for_plot(scores)
-
-
-with st.container():
-    st.subheader('Sentiments over time 📊 📈 : ')
-    st.line_chart(data = plot) 
+ 
 
 def cloud(max_word, max_font):
     
@@ -124,22 +126,39 @@ def cloud(max_word, max_font):
     st.image(wc.to_array())
 
     
-def main():
+#for streamlit app    
+    
+if((keyword != '') & (cities != '') & (radii != 0) & (nt != 0)):
+    only_tweet = fetch_tweets(keyword, cities, radii, nt,start_date,end_date)[['date', 'content']]   
+    
+    st.write('Tweets  💬', only_tweet)
+    
+    scores = compound_score(only_tweet)
+    plot = for_plot(scores)
+
+
     with st.container():
-        st.write("# Text Summarization with a WordCloud 📖 ")
-        col1, col2 = st.columns(2)
-        with col1:
-            max_word = st.slider("Max words", 10, 50, 100)
-            #st.write(max_word)
-        with col2:
-            max_font = st.slider("Max Font Size", 100, 350, 100)
-            #st.write(max_word)
-        
-        cpad1, col, pad2 = st.columns((5,20,5))
-        with col:
-            st.write(cloud( max_word, max_font), use_column_width=True)
-if __name__=="__main__":
-    main()
+        st.subheader('Sentiments over time 📊 📈 : ')
+        st.line_chart(data = plot)
+
+
+    def main():
+        with st.container():
+            st.write("# Text Summarization with a WordCloud 📖 ")
+            col1, col2 = st.columns(2)
+            with col1:
+                max_word = st.slider("Max words", 10, 50, 100)
+                #st.write(max_word)
+            with col2:
+                max_font = st.slider("Max Font Size", 100, 350, 100)
+                #st.write(max_word)
+
+            cpad1, col, pad2 = st.columns((5,20,5))
+            with col:
+                st.write(cloud( max_word, max_font), use_column_width=True)
+
+    if __name__=="__main__":
+        main()
 
 
 
